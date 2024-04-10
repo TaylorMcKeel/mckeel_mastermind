@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {  GAMES_API, GREATEST_POSSIBLE_NUM, MAX_NUM_GUESSES } from "../constants";
+import {  GAMES_API, GREATEST_POSSIBLE_NUM } from "../constants";
 import MastermindApi from "../hooks/api";
 import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns} from "../hooks/gameplayFunctions";
 
@@ -84,7 +84,7 @@ const Game = () => {
 
   const deleteCurrentGame = async () => {
     try {
-      await axios.delete("/api/games");
+      await axios.delete(GAMES_API);
       console.log("Game was deleted from the database");
     } catch (err) {
       console.log("Error deleting game:", err);

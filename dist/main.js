@@ -4512,7 +4512,7 @@ var Game = function Game() {
           case 0:
             _context3.prev = 0;
             _context3.next = 3;
-            return axios__WEBPACK_IMPORTED_MODULE_5__["default"]["delete"]("/api/games");
+            return axios__WEBPACK_IMPORTED_MODULE_5__["default"]["delete"](_constants__WEBPACK_IMPORTED_MODULE_1__.GAMES_API);
           case 3:
             console.log("Game was deleted from the database");
             _context3.next = 9;
@@ -4815,7 +4815,6 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 
-var BASE_URL = "http://localhost:5001";
 var MastermindApi = /*#__PURE__*/function () {
   function MastermindApi() {
     _classCallCheck(this, MastermindApi);
@@ -4983,6 +4982,9 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 
+
+//This function is used to calculate the number of turns remaining in the game. It will return the number of turns remaining based on the number of plays in the game object.
+
 var calculateRemainingTurns = function calculateRemainingTurns(gameData) {
   return gameData.game ? _constants__WEBPACK_IMPORTED_MODULE_1__.MAX_NUM_GUESSES - gameData.game.plays : _constants__WEBPACK_IMPORTED_MODULE_1__.MAX_NUM_GUESSES;
 };
@@ -4990,10 +4992,8 @@ var calculateRemainingTurns = function calculateRemainingTurns(gameData) {
 //This function is used to handle the change of the guess input field. It checks if the guess is the correct length and if the numbers are within the correct range. If the guess is not valid, it will set an error message. If the guess is valid, it will set the guess in the gameData object and clear the error message.
 var handleGuessChange = function handleGuessChange(ev, gameData, setGameData, GREATEST_POSSIBLE_NUM) {
   var newGuess = ev.target.value;
-  console.log(ev);
   var game = gameData.game;
-  console.log(newGuess, game);
-  if (newGuess.length > game.difficulty || isNaN(newGuess)) {
+  if (!isGuessCorrectLength(game, newGuess)) {
     setGameData(function (prevGameData) {
       return _objectSpread(_objectSpread({}, prevGameData), {}, {
         error: "Guess must be ".concat(game.difficulty, " numbers")
@@ -5002,7 +5002,7 @@ var handleGuessChange = function handleGuessChange(ev, gameData, setGameData, GR
     return;
   }
   for (var i = 0; i < newGuess.length; i++) {
-    if (newGuess[i] > GREATEST_POSSIBLE_NUM) {
+    if (areNumsOutOfRange(newGuess[i])) {
       setGameData(function (prevGameData) {
         return _objectSpread(_objectSpread({}, prevGameData), {}, {
           error: 'Number must be between 0-7'
@@ -5018,37 +5018,55 @@ var handleGuessChange = function handleGuessChange(ev, gameData, setGameData, GR
     });
   });
 };
+var isGuessCorrectLength = function isGuessCorrectLength(game, newGuess) {
+  if (newGuess.length > game.difficulty || isNaN(newGuess)) {
+    return false;
+  } else {
+    return true;
+  }
+};
+var areNumsOutOfRange = function areNumsOutOfRange(num) {
+  if (num > _constants__WEBPACK_IMPORTED_MODULE_1__.GREATEST_POSSIBLE_NUM) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
-// This function is used to display the previous guesses and their scores. It will return null if there are no previous guesses. Otherwise, it will map over the previous guesses and return a div with the guess and the number of numbers and places that were correct.
+// This function is used to display the previous guesses and their scores. It will return null if there are no previous guesses. Otherwise, it will map over the previous guesses and return a div with the guess and how many of the numbers were correct, and of those how many are in the correct place.
 
 var displayPreviousGuesses = function displayPreviousGuesses(gameData) {
   var game = gameData.game;
   if (!game || !game.prevPlays || game.prevPlays.length === 0) {
     return null;
   }
-  return game.prevPlays.slice().reverse().map(function (play) {
+  return game.prevPlays.slice().reverse().map(function (numbersPlayed) {
     var numbersMap = createNumbersMap(game);
-    var _determineHowCorrect = determineHowCorrect(play, game, numbersMap),
+    var _determineHowCorrect = determineHowCorrect(numbersPlayed, game, numbersMap),
       correctNumberCount = _determineHowCorrect.correctNumberCount,
       numbersInCorrectPlace = _determineHowCorrect.numbersInCorrectPlace;
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "play",
-      key: play.join("")
+      key: numbersPlayed.join("")
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
-    }, play), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
+    }, numbersPlayed), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
     }, "Numbers Correct: ", correctNumberCount), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
     }, "Places Correct: ", numbersInCorrectPlace));
   });
 };
+
+//This function is used to create a map of the numbers in the correct answer. It will return an object with the numbers as keys and the number of times they appear in the correct answer as values.
 var createNumbersMap = function createNumbersMap(game) {
   return game.numbers.reduce(function (acc, curr) {
     acc[curr] = (acc[curr] || 0) + 1;
     return acc;
   }, {});
 };
+
+//This function is used to determine how correct a guess is. It will return an object with how many correct numbers and how many numbers are in the correct place.
 var determineHowCorrect = function determineHowCorrect(play, game, numbersMap) {
   var correctNumberCount = 0;
   var numbersInCorrectPlace = 0;

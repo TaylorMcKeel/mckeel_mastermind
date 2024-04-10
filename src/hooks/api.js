@@ -1,6 +1,6 @@
 import axios from "axios";
 import { GAMES_API, NUMBERS_API } from "../constants";
-const BASE_URL = "http://localhost:5001";
+
 
 class MastermindApi{
 

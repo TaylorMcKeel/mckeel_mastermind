@@ -40,6 +40,7 @@ const Home = () => {
         prevPlays: [],
         difficulty: difficultyLevel
       });
+      
       localStorage.setItem('gameId', createdGame._id)
     } catch (err) {
       console.log(err)
