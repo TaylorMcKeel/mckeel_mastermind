@@ -10,11 +10,11 @@ const {
 } = require('../controllers/gameController')
 
 router.route('/')
-  .get(getGame)
   .post(createGame)
   .delete(deleteGame)
 
 router.route('/:gameId')
+  .get(getGame)
   .put(updateGame)
 
 

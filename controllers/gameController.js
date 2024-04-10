@@ -3,7 +3,7 @@ const Game = require('../models/Game')
 
 const getGame = async(req,res,next)=>{
   try {
-    const result = await Game.find({})
+    const result = await Game.findById(req.params.gameId)
     res
     .status(200)
     .setHeader('Content-Type','application/json')

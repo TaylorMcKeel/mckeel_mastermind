@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { NUMBERS_API, GAMES_API } from "../constants";
+import MastermindApi from "../hooks/api";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -10,10 +11,11 @@ const Home = () => {
 //since only one game runs at a time, when this component mounts all games are deleted.
   useEffect(() => {
     const deleteGames = async () => {
+      console.log(MastermindApi)
       try {
-        await axios
-          .delete(GAMES_API)
-          .then((res) => console.log(`${res} was deleted from the database`));
+        MastermindApi.deleteGames()
+          .then
+          ((res) => console.log(`${res} was deleted from the database`));
       } catch (err) {
         console.log(err)
       }
@@ -26,34 +28,19 @@ const Home = () => {
   //this function gets 4 random numbers from the api, and sends the new game to the database.
   const startNewGame = async () => {
     let randomNumbers
+    localStorage.clear()
     try {
-      await axios
-        .get(
-          NUMBERS_API,
-          {
-            params: {
-              'num': difficultyLevel,
-              'min': 0,
-              'max': 7,
-              'col': 1,
-              'base': 10,
-              'format': 'plain',
-              'rnd': 'new'
-            }
-          }
-        )
-        .then((res) => {
-          randomNumbers = res.data.split("\n")
-          randomNumbers.pop()
-        });
-
-      await axios.post(GAMES_API, {
+      const generatedNumbers = await MastermindApi.getRandomNumbers(difficultyLevel)
+      randomNumbers = generatedNumbers.split("\n")
+      randomNumbers.pop()
+      
+      const createdGame = await MastermindApi.createGame({
         numbers: randomNumbers,
         plays: 0,
         prevPlays: [],
         difficulty: difficultyLevel
       });
-
+      localStorage.setItem('gameId', createdGame._id)
     } catch (err) {
       console.log(err)
     }
