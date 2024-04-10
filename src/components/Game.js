@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {  GAMES_API, MAX_GUESS_LENGTH, MAX_NUM_GUESSES } from "../constants";
+import {  GAMES_API, GREATEST_POSSIBLE_NUM, MAX_NUM_GUESSES } from "../constants";
 import MastermindApi from "../hooks/api";
-//put functions in chronological order
-
+import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns} from "../hooks/gameplayFunctions";
 
 
 const Game = () => {
@@ -18,7 +17,7 @@ const Game = () => {
   const [gameData, setGameData] = useState(initialGameData);
   const navigate = useNavigate();
 
-  const count = gameData.game?.plays ? MAX_NUM_GUESSES - gameData.game.plays : MAX_NUM_GUESSES;
+  const numberOfTurnsRemaining = calculateRemainingTurns(gameData)
 
   useEffect(() => {
     const getInitialGame = async () => {
@@ -36,35 +35,6 @@ const Game = () => {
 
     getInitialGame();
   }, []);
-
-  const handleGuessChange = (ev) => {
-    const newGuess = ev.target.value;
-    const { game } = gameData;
-
-    if (!game || newGuess.length !== game.difficulty || isNaN(newGuess)) {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        error: `Guess must be ${game.difficulty} numbers`
-      }));
-      return;
-    }
-
-    for (let i = 0; i < newGuess.length; i++) {
-      if (newGuess[i] < 0 || newGuess[i] > MAX_GUESS_LENGTH) {
-        setGameData(prevGameData => ({
-          ...prevGameData,
-          error: 'Number must be between 0-7'
-        }));
-        return;
-      }
-    }
-
-    setGameData(prevGameData => ({
-      ...prevGameData,
-      guess: newGuess.split(""),
-      error: ""
-    }));
-  };
 
   const checkAnswer = async () => {
     const { guess, game } = gameData;
@@ -110,50 +80,7 @@ const Game = () => {
     }
   };
 
-  const displayPreviousGuesses = () => {
-    const { game } = gameData;
-    if (!game || !game.prevPlays || game.prevPlays.length === 0) {
-      return null;
-    }
-
-    return game.prevPlays.slice().reverse().map((play) => {
-      const checkNums = countNumbers(game);
-      const { numbersRight, placesRight } = calculateScores(play, game, checkNums);
-
-      return (
-        <div className='play' key={play.join("")}>
-          <p className='playDetail'>{play}</p>
-          <p className='playDetail'>Numbers Correct: {numbersRight}</p>
-          <p className='playDetail'>Places Correct: {placesRight}</p>
-        </div>
-      );
-    });
-  };
-
-  const countNumbers = (game) => {
-    return game.numbers.reduce((acc, curr) => {
-      acc[curr] = (acc[curr] || 0) + 1;
-      return acc;
-    }, {});
-  };
-
-  const calculateScores = (play, game, checkNums) => {
-    let numbersRight = 0;
-    let placesRight = 0;
-
-    for (let i = 0; i < play.length; i++) {
-      if (checkNums[play[i]] && checkNums[play[i]] > 0) {
-        numbersRight++;
-        checkNums[play[i]]--;
-
-        if (play[i] === game.numbers[i]) {
-          placesRight++;
-        }
-      }
-    }
-
-    return { numbersRight, placesRight };
-  };
+  
 
   const deleteCurrentGame = async () => {
     try {
@@ -189,14 +116,14 @@ const Game = () => {
       )}
       {gameData.gameOverCount === 0 && gameData.game && (
         <div id='gamePlay'>
-          <p>You have {count} turns remaining</p>
+          <p>You have {numberOfTurnsRemaining} turns remaining</p>
           <form>
             <input
               type="text"
               id="guess"
               value={gameData.guess.join("")}
               name="guess"
-              onChange={handleGuessChange}
+              onChange={(ev) => handleGuessChange(ev, gameData, setGameData, GREATEST_POSSIBLE_NUM)}
             />
             <p id='error'>{gameData.error}</p>
             <button
@@ -210,7 +137,7 @@ const Game = () => {
             </button>
           </form>
 
-          <ul id='prevPlays'>{displayPreviousGuesses()}</ul>
+          <ul id='prevPlays'>{displayPreviousGuesses(gameData, setGameData)}</ul>
         </div>
       )}
     </>
