@@ -7,7 +7,7 @@ const path = require('path')
 const games = require('./routes/games')
 
 
-dotenv.config({path: `./config/config.env`})
+dotenv.config()
 
 connectDB()
 
