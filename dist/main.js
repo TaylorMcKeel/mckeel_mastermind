@@ -4905,6 +4905,14 @@ var handleGuessChange = function handleGuessChange(ev, gameData, setGameData, GR
       return;
     }
   }
+  if (doesGuessExist(newGuess, game)) {
+    setGameData(function (prevGameData) {
+      return _objectSpread(_objectSpread({}, prevGameData), {}, {
+        error: 'Guess already exists'
+      });
+    });
+    return;
+  }
   setGameData(function (prevGameData) {
     return _objectSpread(_objectSpread({}, prevGameData), {}, {
       guess: newGuess.split(""),
@@ -4926,6 +4934,14 @@ var areNumsOutOfRange = function areNumsOutOfRange(num) {
     return false;
   }
 };
+var doesGuessExist = function doesGuessExist(newGuess, game) {
+  game.prevPlays.forEach(function (play) {
+    if (play.nums.join("") === newGuess) {
+      return true;
+    }
+  });
+  return false;
+};
 
 // This function is used to display the previous guesses and their scores. It will return null if there are no previous guesses. Otherwise, it will map over the previous guesses and return a div with the guess and how many of the numbers were correct, and of those how many are in the correct place.
 
@@ -4934,49 +4950,21 @@ var displayPreviousGuesses = function displayPreviousGuesses(gameData) {
   if (!game || !game.prevPlays || game.prevPlays.length === 0) {
     return null;
   }
-  return game.prevPlays.slice().reverse().map(function (numbersPlayed) {
-    var numbersMap = createNumbersMap(game);
-    var _determineHowCorrect = determineHowCorrect(numbersPlayed, game, numbersMap),
-      correctNumberCount = _determineHowCorrect.correctNumberCount,
-      numbersInCorrectPlace = _determineHowCorrect.numbersInCorrectPlace;
+  return game.prevPlays.map(function (guess) {
+    var nums = guess.nums,
+      correctNumberCount = guess.correctNumberCount,
+      numbersInCorrectPlace = guess.numbersInCorrectPlace;
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "play",
-      key: numbersPlayed.join("")
+      key: nums.join("")
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
-    }, numbersPlayed), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
+    }, nums), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
     }, "Numbers Correct: ", correctNumberCount), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
       className: "playDetail"
     }, "Places Correct: ", numbersInCorrectPlace));
   });
-};
-
-//This function is used to create a map of the numbers in the correct answer. It will return an object with the numbers as keys and the number of times they appear in the correct answer as values.
-var createNumbersMap = function createNumbersMap(game) {
-  return game.numbers.reduce(function (acc, curr) {
-    acc[curr] = (acc[curr] || 0) + 1;
-    return acc;
-  }, {});
-};
-
-//This function is used to determine how correct a guess is. It will return an object with how many correct numbers and how many numbers are in the correct place.
-var determineHowCorrect = function determineHowCorrect(play, game, numbersMap) {
-  var correctNumberCount = 0;
-  var numbersInCorrectPlace = 0;
-  for (var i = 0; i < play.length; i++) {
-    if (numbersMap[play[i]] && numbersMap[play[i]] > 0) {
-      correctNumberCount++;
-      numbersMap[play[i]]--;
-      if (play[i] === game.numbers[i]) {
-        numbersInCorrectPlace++;
-      }
-    }
-  }
-  return {
-    correctNumberCount: correctNumberCount,
-    numbersInCorrectPlace: numbersInCorrectPlace
-  };
 };
 var checkAnswer = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(gameData, setGameData) {
@@ -4990,7 +4978,11 @@ var checkAnswer = /*#__PURE__*/function () {
             break;
           }
           currentGame = _objectSpread({}, game);
-          currentGame.prevPlays.push(guess);
+          currentGame.prevPlays.unshift({
+            nums: guess,
+            numbersInCorrectPlace: 0,
+            correctNumberCount: 0
+          });
           currentGame.plays++;
           setGameData(function (prevGameData) {
             return _objectSpread(_objectSpread({}, prevGameData), {}, {

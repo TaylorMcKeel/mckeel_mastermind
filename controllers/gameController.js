@@ -1,5 +1,5 @@
 const Game = require('../models/Game')
-const { getRandomNumbers, updateGameState }= require('./utils/controllerFunctions')
+const { getRandomNumbers, updateGameState, updatePrevPlays }= require('./utils/controllerFunctions')
 
 const getGame = async(req,res,next)=>{
   try {
@@ -32,7 +32,8 @@ const createGame = async(req,res,next)=>{
 const updateGame = async(req,res,next)=>{
   try {
     const gameData = req.body
-    const updatedGame = await updateGameState(gameData)
+    gameData.game.gameState = await updateGameState(gameData)
+    const updatedGame = await updatePrevPlays(gameData)
     const result = await Game.findByIdAndUpdate(req.params.gameId, updatedGame, {new: true})
     res
     .status(200)
