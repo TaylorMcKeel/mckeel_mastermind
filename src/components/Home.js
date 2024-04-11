@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { NUMBERS_API, GAMES_API } from "../constants";
 import MastermindApi from "../hooks/api";
 
 const Home = () => {
@@ -27,20 +25,15 @@ const Home = () => {
 
   //this function gets 4 random numbers from the api, and sends the new game to the database.
   const startNewGame = async () => {
-    let randomNumbers
     localStorage.clear()
-    try {
-      const generatedNumbers = await MastermindApi.getRandomNumbers(difficultyLevel)
-      randomNumbers = generatedNumbers.split("\n")
-      randomNumbers.pop()
-      
+    try { 
       const createdGame = await MastermindApi.createGame({
-        numbers: randomNumbers,
+        numbers: [],
         plays: 0,
         prevPlays: [],
-        difficulty: difficultyLevel
+        difficulty: difficultyLevel,
+        gameState: 0
       });
-      
       localStorage.setItem('gameId', createdGame._id)
     } catch (err) {
       console.log(err)

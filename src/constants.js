@@ -1,4 +1,4 @@
-export const GAMES_API = "/api/games/";
+export const GAMES_API_ENDPOINT = "/api/games/";
 
 export const NUMBERS_API = "https://www.random.org/integers/";
 

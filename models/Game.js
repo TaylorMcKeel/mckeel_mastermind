@@ -19,6 +19,10 @@ const GameSchema = new Schema({
   difficulty:{
     type: Number,
     required: true
+  },
+  gameState:{
+    type: Number,
+    required: true
   }
 },{
   timestamps: true

@@ -1,5 +1,5 @@
 const Game = require('../models/Game')
-
+import { getRandomNumbers } from './utils/controllerFunctions'
 
 const getGame = async(req,res,next)=>{
   try {
@@ -16,7 +16,10 @@ const getGame = async(req,res,next)=>{
 
 const createGame = async(req,res,next)=>{
   try {
-    const result = await Game.create(req.body)
+    const newGame = req.body
+    newGame.numbers = await getRandomNumbers(newGame.difficulty)
+    const result = await Game.create(newGame)
+    
     res
     .status(201)
     .setHeader('Content-Type','application/json')

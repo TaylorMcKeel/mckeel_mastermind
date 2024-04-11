@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {  GAMES_API, GREATEST_POSSIBLE_NUM } from "../constants";
+import {  GAMES_API_ENDPOINT, GREATEST_POSSIBLE_NUM } from "../constants";
 import MastermindApi from "../hooks/api";
 import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns} from "../hooks/gameplayFunctions";
 
@@ -10,12 +10,17 @@ const Game = () => {
   const initialGameData = {
     game: {},
     guess: [],
-    gameOverCount: 0,
     error: ""
   };
 
   const [gameData, setGameData] = useState(initialGameData);
   const navigate = useNavigate();
+
+  const GameState = Object.freeze({
+    GAME_IN_PROGRESS: 0,
+    GAME_OUT_OF_GUESSES: 1,
+    GAME_WON: 2
+  })
 
   const numberOfTurnsRemaining = calculateRemainingTurns(gameData)
 
@@ -50,7 +55,7 @@ const Game = () => {
       updatedGame.plays++;
 
       try {
-        await axios.put(`${GAMES_API}/${updatedGame._id}`, updatedGame);
+        await axios.put(`${GAMES_API_ENDPOINT}/${updatedGame._id}`, updatedGame);
 
         if (guess.join("") === updatedGame.numbers.join("")) {
           setGameData(prevGameData => ({
@@ -84,7 +89,7 @@ const Game = () => {
 
   const deleteCurrentGame = async () => {
     try {
-      await axios.delete(GAMES_API);
+      await axios.delete(GAMES_API_ENDPOINT);
       console.log("Game was deleted from the database");
     } catch (err) {
       console.log("Error deleting game:", err);
@@ -102,19 +107,19 @@ const Game = () => {
 
   return (
     <>
-      {gameData.gameOverCount === 1 && (
+      {gameData.game.gameState === GameState.GAME_OUT_OF_GUESSES && (
         <div className='textAndButton'>
           <h1>Game Over</h1>
           <button onClick={navigateHome}>Play Again</button>
         </div>
       )}
-      {gameData.gameOverCount === 2 && (
+      {gameData.game.gameState === GameState.GAME_WON && (
         <div className="animated-background">
           <h1>YOU WIN</h1>
           <button onClick={navigateHome}>Play Again</button>
         </div>
       )}
-      {gameData.gameOverCount === 0 && gameData.game && (
+      {gameData.game.gameState === GameState.GAME_IN_PROGRESS && gameData.game && (
         <div id='gamePlay'>
           <p>You have {numberOfTurnsRemaining} turns remaining</p>
           <form>
