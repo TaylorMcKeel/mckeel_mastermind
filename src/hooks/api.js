@@ -6,7 +6,6 @@ class MastermindApi{
 
     static async getGame(gameId){
         const res = await axios.get(`${GAMES_API_ENDPOINT}${gameId}`);
-        console.log('api',res.data)
         return res.data;
     }
 
@@ -21,6 +20,10 @@ class MastermindApi{
         return res;
     }
 
+    static async updateGame(gameId,gameData){
+        const res = await axios.put(`${GAMES_API_ENDPOINT}${gameId}`, gameData);
+        return res.data;
+    }
 
 }
 

@@ -1,6 +1,8 @@
-export const getRandomNumbers= async(difficultyLevel)=>{
+const axios = require('axios');
+
+const getRandomNumbers= async(difficultyLevel)=>{
   try {
-    const res = await axios.get(NUMBERS_API, { params: {
+    const res = await axios.get(process.env.NUMBERS_API_URL, { params: {
       'num': difficultyLevel,
       'min': 0,
       'max': 7,
@@ -30,48 +32,19 @@ const createRandomNumbers = (difficultyLevel) => {
 
 
 
-export const checkAnswer = async (gameData) => {
+const updateGameState = async (gameData) => {
   const { guess, game } = gameData;
-
-  if (guess.length === game.difficulty) {
-    setGameData(prevGameData => ({
-      ...prevGameData,
-      error: ""
-    }));
-
-    const updatedGame = { ...game };
-    updatedGame.prevPlays.push(guess);
-    updatedGame.plays++;
-
-    try {
-      await axios.put(`${GAMES_API_ENDPOINT}/${updatedGame._id}`, updatedGame);
-
-      if (guess.join("") === updatedGame.numbers.join("")) {
-        setGameData(prevGameData => ({
-          ...prevGameData,
-          gameOverCount: 2
-        }));
-      } else if (updatedGame.plays > 9) {
-        setGameData(prevGameData => ({
-          ...prevGameData,
-          gameOverCount: 1
-        }));
-      } else {
-        setGameData(prevGameData => ({
-          ...prevGameData,
-          game: updatedGame,
-          guess: []
-        }));
-      }
-    } catch (err) {
-      console.log("Error updating game:", err);
-    }
-  } else {
-    setGameData(prevGameData => ({
-      ...prevGameData,
-      error: `Must have ${game.difficulty} digits`
-    }));
-  }
+  if (isGuessCorrect(guess, game.numbers)) {
+    game.gameState = 2
+  } else if (game.plays > 9) {
+    game.gameState = 1
+  } 
+  return game;
 };
 
+const isGuessCorrect = (guess, numbers) => {
+  return guess.join("") === numbers.join("");
+}
 
+
+module.exports = { getRandomNumbers, updateGameState }

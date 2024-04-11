@@ -1,5 +1,6 @@
 import React from "react";
 import { MAX_NUM_GUESSES , GREATEST_POSSIBLE_NUM} from "../constants";
+import MastermindApi from "../hooks/api";
 
 //This function is used to calculate the number of turns remaining in the game. It will return the number of turns remaining based on the number of plays in the game object.
 
@@ -12,7 +13,7 @@ export const calculateRemainingTurns = (gameData ) => {
 export const handleGuessChange = (ev, gameData, setGameData, GREATEST_POSSIBLE_NUM) => {
   const newGuess = ev.target.value;
   const { game } = gameData;
-  if (!isGuessCorrectLength(game, newGuess)) {
+  if (isGuessTooLong(game, newGuess)) {
     setGameData(prevGameData => ({
       ...prevGameData,
       error: `Guess must be ${game.difficulty} numbers`
@@ -37,11 +38,11 @@ export const handleGuessChange = (ev, gameData, setGameData, GREATEST_POSSIBLE_N
   }));
 };
 
-const isGuessCorrectLength =(game, newGuess)=>{
+const isGuessTooLong =(game, newGuess)=>{
   if (newGuess.length > game.difficulty || isNaN(newGuess)){
-    return false
-  }else{
     return true
+  }else{
+    return false
   }
 }
 
@@ -102,3 +103,41 @@ const determineHowCorrect = (play, game, numbersMap) => {
   return { correctNumberCount, numbersInCorrectPlace };
 };
 
+
+export const checkAnswer = async (gameData, setGameData) => {
+  const { guess, game } = gameData;
+  if (isGuessCorrectLength(guess, game)) {
+
+    const currentGame = { ...game };
+    currentGame.prevPlays.push(guess);
+    currentGame.plays++;
+    setGameData(prevGameData => ({
+      ...prevGameData,
+      error: "",
+      game: currentGame
+    }));
+
+    try {
+      const updatedGame = await MastermindApi.updateGame(currentGame._id, gameData);
+      console.log(updatedGame)
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        error: "",
+        game: updatedGame,
+        guess: []
+      }));
+
+    } catch (err) {
+      console.log("Error updating game:", err);
+    }
+  }  else {
+    setGameData(prevGameData => ({
+      ...prevGameData,
+      error: `Must have ${game.difficulty} digits`
+    }));
+  }      
+};
+
+const isGuessCorrectLength = (guess, game) => {
+  return guess.length === game.difficulty;
+}

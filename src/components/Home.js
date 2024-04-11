@@ -6,22 +6,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [difficultyLevel, setDifficultyLevel] = useState(4)
 
-//since only one game runs at a time, when this component mounts all games are deleted.
-  useEffect(() => {
-    const deleteGames = async () => {
-      console.log(MastermindApi)
-      try {
-        MastermindApi.deleteGames()
-          .then
-          ((res) => console.log(`${res} was deleted from the database`));
-      } catch (err) {
-        console.log(err)
-      }
-    };
-
-    deleteGames();
-  }, []);
-  
 
   //this function gets 4 random numbers from the api, and sends the new game to the database.
   const startNewGame = async () => {
@@ -55,21 +39,42 @@ const Home = () => {
     }
     navigate("/gameplay");
   };
-
-  return (
-    <div className='textAndButton'>
-      <h1 >Mastermind</h1>
-      <div id='difficulty'>
-        <label htmlFor='difficulty'>Choose a Difficulty:</label>
-        <select name='difficulty'  onChange={handleDifficultyChange}>
-          <option value='4'>Easy: 4 Numbers</option>
-          <option value='5'>Medium: 5 Numbers</option>
-          <option value='6'>Hard: 6 Numbers</option>
-        </select>
+  const continueOldGame = ()=>{
+    navigate("/gameplay");
+  }
+  //if there is a game in local storage, we will give the user the option to continue the game
+  if(localStorage.getItem('gameId')){
+    return (
+      <div className='textAndButton'>
+        <h1 >Mastermind</h1>
+        <div id='difficulty'>
+          <label htmlFor='difficulty'>Choose a Difficulty:</label>
+          <select name='difficulty'  onChange={handleDifficultyChange}>
+            <option value='4'>Easy: 4 Numbers</option>
+            <option value='5'>Medium: 5 Numbers</option>
+            <option value='6'>Hard: 6 Numbers</option>
+          </select>
+        </div>
+        <button onClick={onLetsBeginClicked}>Start New Game</button>
+        <button onClick={continueOldGame}>Continue Old Game</button>
       </div>
-      <button onClick={onLetsBeginClicked}>Let's Begin</button>
-    </div>
-  );
+    );
+  }else{
+    return (
+      <div className='textAndButton'>
+        <h1 >Mastermind</h1>
+        <div id='difficulty'>
+          <label htmlFor='difficulty'>Choose a Difficulty:</label>
+          <select name='difficulty'  onChange={handleDifficultyChange}>
+            <option value='4'>Easy: 4 Numbers</option>
+            <option value='5'>Medium: 5 Numbers</option>
+            <option value='6'>Hard: 6 Numbers</option>
+          </select>
+        </div>
+        <button onClick={onLetsBeginClicked}>Start New Game</button>
+      </div>
+    );
+  }
 };
 
 export default Home;

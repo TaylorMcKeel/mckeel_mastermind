@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {  GAMES_API_ENDPOINT, GREATEST_POSSIBLE_NUM } from "../constants";
 import MastermindApi from "../hooks/api";
-import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns} from "../hooks/gameplayFunctions";
+import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns, checkAnswer} from "../hooks/gameplayFunctions";
 
 
 const Game = () => {
@@ -41,51 +41,6 @@ const Game = () => {
     getInitialGame();
   }, []);
 
-  const checkAnswer = async () => {
-    const { guess, game } = gameData;
-
-    if (guess.length === game.difficulty) {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        error: ""
-      }));
-
-      const updatedGame = { ...game };
-      updatedGame.prevPlays.push(guess);
-      updatedGame.plays++;
-
-      try {
-        await axios.put(`${GAMES_API_ENDPOINT}/${updatedGame._id}`, updatedGame);
-
-        if (guess.join("") === updatedGame.numbers.join("")) {
-          setGameData(prevGameData => ({
-            ...prevGameData,
-            gameOverCount: 2
-          }));
-        } else if (updatedGame.plays > 9) {
-          setGameData(prevGameData => ({
-            ...prevGameData,
-            gameOverCount: 1
-          }));
-        } else {
-          setGameData(prevGameData => ({
-            ...prevGameData,
-            game: updatedGame,
-            guess: []
-          }));
-        }
-      } catch (err) {
-        console.log("Error updating game:", err);
-      }
-    } else {
-      setGameData(prevGameData => ({
-        ...prevGameData,
-        error: `Must have ${game.difficulty} digits`
-      }));
-    }
-  };
-
-  
 
   const deleteCurrentGame = async () => {
     try {
@@ -135,7 +90,7 @@ const Game = () => {
               type="button"
               onClick={(event) => {
                 event.preventDefault();
-                checkAnswer();
+                checkAnswer(gameData, setGameData);
               }}
             >
               Submit
