@@ -1,5 +1,14 @@
 const axios = require('axios');
 
+
+const GameState = Object.freeze({
+  GAME_IN_PROGRESS: 0,
+  GAME_OUT_OF_GUESSES: 1,
+  GAME_WON: 2,
+  MAX_PLAY_BEFORE_GAME_OVER: 9,
+})
+
+
 const getRandomNumbers= async(difficultyLevel)=>{
   try {
     const res = await axios.get(process.env.NUMBERS_API_URL, { params: {
@@ -35,11 +44,11 @@ const createRandomNumbers = (difficultyLevel) => {
 const updateGameState =  (gameData) => {
   const { guess, game } = gameData;
   if (isGuessCorrect(guess, game.numbers)) {
-    return 2
-  } else if (game.plays > 9) {
-    return 1
+    return GameState.GAME_WON;
+  } else if (game.plays > MAX_PLAY_BEFORE_GAME_OVER) {
+    return GameState.GAME_OUT_OF_GUESSES;
   } 
-  return 0;
+  return GameState.GAME_IN_PROGRESS;
 };
 
 const isGuessCorrect = (guess, numbers) => {

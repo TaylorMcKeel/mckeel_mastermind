@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MastermindApi from "../hooks/api";
 
+const DIFFICULTY_DEFAULT_VALUE = 4;
+
 const Home = () => {
   const navigate = useNavigate();
-  const [difficultyLevel, setDifficultyLevel] = useState(4)
+  const [difficultyLevel, setDifficultyLevel] = useState(DIFFICULTY_DEFAULT_VALUE)
 
 
   //this function gets 4 random numbers from the api, and sends the new game to the database.
