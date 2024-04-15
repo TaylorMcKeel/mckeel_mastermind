@@ -1,16 +1,21 @@
 import React from "react";
 import { MAX_NUM_GUESSES , GREATEST_POSSIBLE_NUM} from "../constants";
 import MastermindApi from "../hooks/api";
-import logger from "../../controllers/utils/logger";
 
-//This function is used to calculate the number of turns remaining in the game. It will return the number of turns remaining based on the number of plays in the game object.
 
+/*
+This function is used to calculate the number of turns remaining in the game. 
+It will return the number of turns remaining based on the number of plays in the game object.
+*/
 export const calculateRemainingTurns = (gameData ) => {
   return gameData.game ? MAX_NUM_GUESSES - gameData.game.plays : MAX_NUM_GUESSES;
 }
-
-
-//This function is used to handle the change of the guess input field. It checks if the guess is the correct length and if the numbers are within the correct range. If the guess is not valid, it will set an error message. If the guess is valid, it will set the guess in the gameData object and clear the error message.
+/*
+This function is used to handle the change of the guess input field. 
+It checks if the guess is the correct length and if the numbers are within the correct range. 
+If the guess is not valid, it will set an error message.
+If the guess is valid, it will set the guess in the gameData object and clear the error message.
+*/
 export const handleGuessChange = (ev, gameData, setGameData, GREATEST_POSSIBLE_NUM) => {
   const newGuess = ev.target.value;
   const { game } = gameData;
@@ -72,8 +77,11 @@ const doesGuessExist = (newGuess, game) => {
   return false
 }
 
-// This function is used to display the previous guesses and their scores. It will return null if there are no previous guesses. Otherwise, it will map over the previous guesses and return a div with the guess and how many of the numbers were correct, and of those how many are in the correct place.
-
+/*
+This function is used to display the previous guesses and their scores.
+It will return null if there are no previous guesses. Otherwise, it will map over the previous guesses 
+and return a div with the guess and how many of the numbers were correct, and of those how many are in the correct place.
+*/
 export const displayPreviousGuesses = (gameData) => {
   const { game } = gameData;
   if (!game || !game.prevPlays || game.prevPlays.length === 0) {
@@ -93,7 +101,9 @@ export const displayPreviousGuesses = (gameData) => {
   });
 };
 
-
+/*
+This function is used to check if the guess is correct.
+*/
 
 export const checkAnswer = async (gameData, setGameData) => {
   const { guess, game } = gameData;
@@ -117,9 +127,9 @@ export const checkAnswer = async (gameData, setGameData) => {
         game: updatedGame,
         guess: []
       }));
-      logger.info(`Game with id ${game._id} was updated :: updateGame, gameController.js`)
+      console.log(`Game with id ${game._id} was updated :: updateGame, gameController.js`)
     } catch (err) {
-      logger.error(`Game with id ${game._id} was not updated :: updateGame, gameController.js - Error: ${err}`)
+      console.error(`Game with id ${game._id} was not updated :: updateGame, gameController.js - Error: ${err}`)
       
     }
   }  else {

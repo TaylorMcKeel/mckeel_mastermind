@@ -4,7 +4,6 @@ import axios from "axios";
 import {  GAMES_API_ENDPOINT, GREATEST_POSSIBLE_NUM } from "../constants";
 import MastermindApi from "../hooks/api";
 import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns, checkAnswer} from "../hooks/gameplayFunctions";
-import logger from "../../controllers/utils/logger";
 
 
 const Game = () => {
@@ -24,6 +23,10 @@ const Game = () => {
   })
 
   const numberOfTurnsRemaining = calculateRemainingTurns(gameData)
+  /*
+  This useEffect hook is used to fetch the initial game from the database. 
+  It will run once when the component is mounted.
+ */
 
   useEffect(() => {
     const getInitialGame = async () => {
@@ -34,22 +37,24 @@ const Game = () => {
           ...prevGameData,
           game: retrievedGame
         }));
-        logger.info('Initial game was fetched :: getInitialGame, Game.js');
+        console.log('Initial game was fetched :: getInitialGame, Game.js');
       } catch (err) {
-        logger.error(`Initial game was not fetched :: getInitialGame, Game.js - Error: ${err} `);
+        console.error(`Initial game was not fetched :: getInitialGame, Game.js - Error: ${err} `);
       }
     };
 
     getInitialGame();
   }, []);
 
-
+/*
+This function is used to delete the current game from the database.
+*/
   const deleteCurrentGame = async () => {
     try {
       await axios.delete(GAMES_API_ENDPOINT);
-      logger.info('Game was deleted :: deleteCurrentGame, Game.js');
+      console.log('Game was deleted :: deleteCurrentGame, Game.js');
     } catch (err) {
-      logger.error('Game was not deleted :: deleteCurrentGame, Game.js - Error: ${err}');
+      console.error('Game was not deleted :: deleteCurrentGame, Game.js - Error: ${err}');
     }
   };
 
@@ -57,9 +62,9 @@ const Game = () => {
     try {
       await deleteCurrentGame();
       navigate('/');
-      logger.info('Navigated to home :: navigateHome, Game.js');
+      console.log('Navigated to home :: navigateHome, Game.js');
     } catch (err) {
-      logger.error('Could not navigate to home :: navigateHome, Game.js - Error: ${err}');
+      console.error('Could not navigate to home :: navigateHome, Game.js - Error: ${err}');
     }
   };
 

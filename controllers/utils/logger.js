@@ -7,7 +7,5 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-logger.info('Info message');
-logger.error('Error message');  
 
 module.exports = logger;

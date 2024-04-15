@@ -1,6 +1,5 @@
-'use strict';
 
-//built my html file and connected script tag automatically
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 require('dotenv').config();
@@ -12,6 +11,22 @@ module.exports = {
   output: {
     filename: 'main.js',
     path: path.join(__dirname, './dist'),
+  },
+  resolve: {
+    fallback: {
+      "https": require.resolve("https-browserify"),
+      "os": require.resolve("os-browserify/browser"),
+      "path": require.resolve("path-browserify"),
+      "zlib": require.resolve("browserify-zlib"),
+      "http": require.resolve("stream-http"),
+      "buffer": require.resolve("buffer/"),
+      "util": require.resolve("util/"),
+      "events": require.resolve("events/"),
+      "url": require.resolve("url/"),
+      "assert": require.resolve("assert/"),
+      "stream": require.resolve("stream-browserify"),
+      "fs": false 
+    }
   },
   module: {
     rules: [
@@ -38,8 +53,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'public/index.html'), // Specify the path to your HTML template
-      filename: 'index.html', // Output HTML file name
+      template: path.join(__dirname, 'public/index.html'),
+      filename: 'index.html',
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser', 
+      Buffer: ['buffer', 'Buffer'], 
     }),
   ],
 };
