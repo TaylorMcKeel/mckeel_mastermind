@@ -1,6 +1,7 @@
 import React from "react";
 import { MAX_NUM_GUESSES , GREATEST_POSSIBLE_NUM} from "../constants";
 import MastermindApi from "../hooks/api";
+import logger from "../../controllers/utils/logger";
 
 //This function is used to calculate the number of turns remaining in the game. It will return the number of turns remaining based on the number of plays in the game object.
 
@@ -116,9 +117,10 @@ export const checkAnswer = async (gameData, setGameData) => {
         game: updatedGame,
         guess: []
       }));
-
+      logger.info(`Game with id ${game._id} was updated :: updateGame, gameController.js`)
     } catch (err) {
-      console.log("Error updating game:", err);
+      logger.error(`Game with id ${game._id} was not updated :: updateGame, gameController.js - Error: ${err}`)
+      
     }
   }  else {
     setGameData(prevGameData => ({

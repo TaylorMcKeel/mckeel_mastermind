@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MastermindApi from "../hooks/api";
+import logger from "../../controllers/utils/logger";
 
 const DIFFICULTY_DEFAULT_VALUE = 4;
 
@@ -21,8 +22,9 @@ const Home = () => {
         gameState: 0
       });
       localStorage.setItem('gameId', createdGame._id)
+      logger.info('New game was created :: startNewGame, Home.js');
     } catch (err) {
-      console.log(err)
+      logger.error('New game was not created :: startNewGame, Home.js');
     }
     
   };
@@ -36,8 +38,9 @@ const Home = () => {
   const onLetsBeginClicked = async () => {
     try {
       await startNewGame();
+      logger.info('Successsfully created new game :: onLetsBeginClicked, Home.js');
     } catch (err) {
-      console.log(err)
+      logger.error(`Failed to create new game :: onLetsBeginClicked, Home.js - Error: ${err}`);
     }
     navigate("/gameplay");
   };

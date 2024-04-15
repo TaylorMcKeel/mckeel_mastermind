@@ -5,7 +5,7 @@ const connectDB = require('./config/db')
 const cors = require('cors')
 const path = require('path')
 const games = require('./routes/games')
-
+const logger = require('./controllers/utils/logger')
 
 dotenv.config()
 

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('./logger');
 
 
 const GameState = Object.freeze({
@@ -22,9 +23,10 @@ const getRandomNumbers= async(difficultyLevel)=>{
     } });
     randomNumbers = res.data.split("\n");
     randomNumbers.pop()
+    logger.info(`Random numbers were generated with api:: getRandomNumbers, controllerFunctions.js`)
     return randomNumbers;
   } catch (err) {
-    console.log(err);
+    logger.error(`Random numbers were not generated with api, instead generated with function:: getRandomNumbers, controllerFunctions.js - Error: ${err}`)
     return createRandomNumbers(difficultyLevel);
   }
   

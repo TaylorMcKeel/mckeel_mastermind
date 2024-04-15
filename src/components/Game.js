@@ -4,6 +4,7 @@ import axios from "axios";
 import {  GAMES_API_ENDPOINT, GREATEST_POSSIBLE_NUM } from "../constants";
 import MastermindApi from "../hooks/api";
 import {handleGuessChange, displayPreviousGuesses, calculateRemainingTurns, checkAnswer} from "../hooks/gameplayFunctions";
+import logger from "../../controllers/utils/logger";
 
 
 const Game = () => {
@@ -33,8 +34,9 @@ const Game = () => {
           ...prevGameData,
           game: retrievedGame
         }));
-      } catch (error) {
-        console.log("Error fetching initial game:", error);
+        logger.info('Initial game was fetched :: getInitialGame, Game.js');
+      } catch (err) {
+        logger.error(`Initial game was not fetched :: getInitialGame, Game.js - Error: ${err} `);
       }
     };
 
@@ -45,9 +47,9 @@ const Game = () => {
   const deleteCurrentGame = async () => {
     try {
       await axios.delete(GAMES_API_ENDPOINT);
-      console.log("Game was deleted from the database");
+      logger.info('Game was deleted :: deleteCurrentGame, Game.js');
     } catch (err) {
-      console.log("Error deleting game:", err);
+      logger.error('Game was not deleted :: deleteCurrentGame, Game.js - Error: ${err}');
     }
   };
 
@@ -55,8 +57,9 @@ const Game = () => {
     try {
       await deleteCurrentGame();
       navigate('/');
+      logger.info('Navigated to home :: navigateHome, Game.js');
     } catch (err) {
-      console.log("Error navigating home:", err);
+      logger.error('Could not navigate to home :: navigateHome, Game.js - Error: ${err}');
     }
   };
 
