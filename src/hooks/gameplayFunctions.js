@@ -108,7 +108,6 @@ This function is used to check if the guess is correct.
 export const checkAnswer = async (gameData, setGameData) => {
   const { guess, game } = gameData;
   if (isGuessCorrectLength(guess, game)) {
-
     const currentGame = { ...game };
     currentGame.prevPlays.unshift({nums: guess, numbersInCorrectPlace: 0, correctNumberCount: 0});
     currentGame.plays++;
@@ -119,8 +118,12 @@ export const checkAnswer = async (gameData, setGameData) => {
     }));
 
     try {
-      const updatedGame = await MastermindApi.updateGame(currentGame._id, gameData);
-      console.log(updatedGame)
+      const newGameData = {
+        game: currentGame,
+        guess: guess,
+        error: ""
+      };
+      const updatedGame = await MastermindApi.updateGame(currentGame._id, newGameData);
       setGameData(prevGameData => ({
         ...prevGameData,
         error: "",

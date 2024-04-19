@@ -5008,7 +5008,7 @@ This function is used to check if the guess is correct.
 
 var checkAnswer = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(gameData, setGameData) {
-    var guess, game, currentGame, updatedGame;
+    var guess, game, currentGame, newGameData, updatedGame;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -5031,11 +5031,15 @@ var checkAnswer = /*#__PURE__*/function () {
             });
           });
           _context.prev = 6;
-          _context.next = 9;
-          return _hooks_api__WEBPACK_IMPORTED_MODULE_2__["default"].updateGame(currentGame._id, gameData);
-        case 9:
+          newGameData = {
+            game: currentGame,
+            guess: guess,
+            error: ""
+          };
+          _context.next = 10;
+          return _hooks_api__WEBPACK_IMPORTED_MODULE_2__["default"].updateGame(currentGame._id, newGameData);
+        case 10:
           updatedGame = _context.sent;
-          console.log(updatedGame);
           setGameData(function (prevGameData) {
             return _objectSpread(_objectSpread({}, prevGameData), {}, {
               error: "",

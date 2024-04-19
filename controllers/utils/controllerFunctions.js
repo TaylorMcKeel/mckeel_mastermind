@@ -56,7 +56,7 @@ const updateGameState =  (gameData) => {
   const { guess, game } = gameData;
   if (isGuessCorrect(guess, game.numbers)) {
     return GameState.GAME_WON;
-  } else if (game.plays > MAX_PLAY_BEFORE_GAME_OVER) {
+  } else if (game.plays > GameState.MAX_PLAY_BEFORE_GAME_OVER) {
     return GameState.GAME_OUT_OF_GUESSES;
   } 
   return GameState.GAME_IN_PROGRESS;

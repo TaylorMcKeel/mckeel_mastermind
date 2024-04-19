@@ -6,6 +6,7 @@ const logger = require('./utils/logger')
 const getGame = async(req,res,next)=>{
   try {
     const result = await Game.findById(req.params.gameId)
+  res
     logger.info(`Game with id ${req.params.gameId} was found :: getGame, gameController.js`)
     res
     .status(200)
@@ -20,6 +21,7 @@ const getGame = async(req,res,next)=>{
 
 const createGame = async(req,res,next)=>{
   try {
+    // const headerInfo=checkForHeaders(req, false)
     const newGame = req.body
     newGame.numbers = await getRandomNumbers(newGame.difficulty)
     const result = await Game.create(newGame)
@@ -27,6 +29,7 @@ const createGame = async(req,res,next)=>{
     res
     .status(201)
     .setHeader('Content-Type','application/json')
+    .setHeader('Bearer',result._id)
     .json(result)
   } catch (err) {
     logger.error(`Game with id ${req.params.gameId} was not created :: createGame, gameController.js - Error: ${err}`);
@@ -37,6 +40,7 @@ const createGame = async(req,res,next)=>{
 const updateGame = async(req,res,next)=>{
   try {
     const gameData = req.body
+  
     gameData.game.gameState = await updateGameState(gameData)
     const updatedGame = await updatePrevPlays(gameData)
     const result = await Game.findByIdAndUpdate(req.params.gameId, updatedGame, {new: true})
